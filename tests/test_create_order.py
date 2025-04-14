@@ -1,7 +1,6 @@
 import allure
 import pytest
 import requests
-
 import scooter_api
 import urls
 
@@ -17,15 +16,21 @@ class TestCreateOrder:
     ])
     def test_choose_the_color_in_success_order(self, color):
         color_body = {"color": color}
-        create_order_with_color = scooter_api.create_order(color_body)
-        assert create_order_with_color.status_code == 201
-        assert create_order_with_color.json()["track"] != None
+        with allure.step("Отправка запроса на создание заказа с цветом {color}"):
+            create_order_with_color = scooter_api.create_order(color_body)
+        with allure.step("Проверяем, что код ответа 201 создан"):
+            assert create_order_with_color.status_code == 201
+        with allure.step("Проверяем, что в ответе присутствует номер заказа"):
+            assert create_order_with_color.json()["track"] != None
 
 
 class TestOrderList:
     @allure.title("Проверка получения списка заказов в тело ответа")
     @allure.description("Проверка получения списка заказов в тело ответа. Проверка кода ответа и наличия непустого массива с заказами")
     def test_return_list_order(self):
-        order_list = requests.get(urls.BASE_URL + urls.ORDER_LIST_ENDPOINT)
-        assert order_list.status_code == 200
-        assert order_list.json()["orders"] != None
+        with allure.step("Отправка запросов на получение списка заказов"):
+            order_list = requests.get(urls.BASE_URL + urls.ORDER_LIST_ENDPOINT)
+        with allure.step("Проверяем, что код ответа 200"):
+            assert order_list.status_code == 200
+        with allure.step("Проверяем, что список заказов не пустой"):
+            assert order_list.json()["orders"] != None
